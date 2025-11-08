@@ -1,14 +1,23 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-async function connectDB(uri) {
-  try {
-    mongoose.set('strictQuery', true);
-    await mongoose.connect(uri, { dbName: 'zeroghost' });
-    console.log(' MongoDB connected');
-  } catch (err) {
-    console.error('MongoDB connection error:', err);
-    throw err;
+const connectDB = async () => {
+  const uri = process.env.MONGO_URI;
+
+  if (!uri) {
+    console.log("⚠️ Skipping MongoDB connection — no URI found (Testing Mode Active)");
+    return;
   }
-}
 
-module.exports = { connectDB };
+  try {
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("✅ MongoDB Connected Successfully");
+  } catch (error) {
+    console.error("❌ MongoDB connection failed:", error.message);
+    console.log("⚠️ Running in No-Database Mode...");
+  }
+};
+
+module.exports = connectDB;
